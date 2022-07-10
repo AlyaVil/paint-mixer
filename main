@@ -104,3 +104,53 @@ function setup() {
 		if (brightness(col) < 80) fill(240); else fill(40);
 		text(palette[i].name, x+50, y+30);
 	}
+function dot(a, b) {
+	if (a.length != b.length) return 0;
+	var res = 0;
+	for (var i=0; i<a.length; ++i) res += a[i]*b[i];
+	return res;
+}
+
+function mouseClicked() {
+	var num = floor((mouseX)/100) + floor((mouseY-50)/100)*10;
+	if (num < 0 || num >= palette.length) return;
+	if (keyIsDown(SHIFT)) mix_b = num;
+	else mix_a = num;
+	draw();
+}
+
+function mouseWheel(event) {
+	mix += event.delta/5000;
+	if (mix < 0) mix = 0;
+	if (mix > 1) mix = 1;
+	draw();
+	return false;
+}
+
+function draw() {
+	var col = getColorFromReflectanceCurve(palette[mix_a].curve);
+	fill(col);
+	rect(650, 600, 100, 100);
+	if (brightness(col) < 80) fill(240); else fill(40);
+	text(int(mix*100)+"%", 700, 640);
+	text(palette[mix_a].name, 700, 675);
+	fill(subtractiveMix(palette[mix_a].curve, palette[mix_b].curve));
+	rect(750, 600, 100, 100);
+	col = getColorFromReflectanceCurve(palette[mix_b].curve);
+	fill(col);
+	rect(850, 600, 100, 100);
+	if (brightness(col) < 80) fill(240); else fill(40);
+	text(int((1-mix)*100)+"%", 900, 640);
+	text(palette[mix_b].name, 900, 675);
+}
+
+function getColorFromReflectanceCurve(refl) {
+	var r = 0, g = 0, b = 0;
+	for (var i=0; i<curve_res; ++i) {
+		r += T2[0][i] * refl[i];
+		g += T2[1][i] * refl[i];
+		b += T2[2][i] * refl[i];
+	}
+	//return color(int(r*255), int(g*255), int(b*255));
+	return linearTosRGB(pow(r,1.8), pow(g,1.8) , pow(b,1.8));
+}
