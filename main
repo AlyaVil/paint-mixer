@@ -154,3 +154,17 @@ function getColorFromReflectanceCurve(refl) {
 	//return color(int(r*255), int(g*255), int(b*255));
 	return linearTosRGB(pow(r,1.8), pow(g,1.8) , pow(b,1.8));
 }
+function subtractiveMix(curve_a, curve_b) {
+	var refl = [];
+	for (var i=0; i<curve_res; ++i) {
+		refl[i] = pow(curve_a[i], mix) * pow(curve_b[i], 1-mix);
+	}
+	return getColorFromReflectanceCurve(refl);
+}
+
+function linearTosRGB(r,g,b) {
+  r = r <= 0.0031308 ? r*12.92 : pow(r, 0.4166667) * 1.055 - 0.055;
+  g = g <= 0.0031308 ? g*12.92 : pow(g, 0.4166667) * 1.055 - 0.055;
+  b = b <= 0.0031308 ? b*12.92 : pow(b, 0.4166667) * 1.055 - 0.055;
+  return color(int(r*255), int(g*255), int(b*255));
+}
